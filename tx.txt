@@ -1,0 +1,12 @@
+# Faiseurs avec corporence élevée qui se chevauchent
+#
+1
+# nombre de particules
+0
+# nombre de faiseurs
+2
+0 0 0 0 5 5
+20 0 0 0 5 5
+# nombre d'articulations
+0
+CONSTRUCTION
