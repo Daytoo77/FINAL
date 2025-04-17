@@ -1,7 +1,3 @@
-// mobile.cc
-// Auteur : theo brochier
-// Version : 5.0
-
 #include "mobile.h"
 #include "message.h"
 #include "constantes.h"
@@ -13,14 +9,33 @@ using namespace std;
 using namespace mobile;
 using namespace tools;
 static Cercle Arene_ex({0.0,0.0},r_max );
+
 Mobile::Mobile(S2d p,Polar v):position(p),vecteurVitesse(v){}
 Mobile::Mobile():position({0.0,0.0}),vecteurVitesse({0.0,0.0}){}
-//-----------------------------------------------------------PARTICULE-------------
+
+//-----------------------------------------PARTICULE--------------------------------
 
 Particule::Particule(S2d position, Polar vecteurVitesse, double compteur)
         : Mobile(position, vecteurVitesse),  compteur(compteur) {}
 
+void Particule::deplacer() {
+    // Calculer nouvelle position
+    position = nextDestination(position, vecteurVitesse);
 
+    // Vérifier collision avec arène et rebondir si nécessaire
+    if (!Arene_ex.point_appartient_cercle(position)) {
+        rebond(position, vecteurVitesse);
+        position = nextDestination(position, vecteurVitesse);
+    }
+}
+
+void Particule::update() {
+    deplacer();
+    // Decrement the counter
+    if (compteur > 0) {
+        --compteur;
+    }
+}
 
 //------------------------------------FAISEUR-------------------------------------
 Faiseur::Faiseur() : rayon(0.0), taille(0) {}
@@ -45,7 +60,6 @@ Faiseur::Faiseur(S2d position,Polar vecteurVitesse, double rayon, int taille)
         cout<<message::faiseur_radius(rayon)<<endl;
         exit(EXIT_FAILURE);
     }
-
 }
 
 bool Faiseur::collision_element(const Faiseur& autre_faiseur) {
@@ -54,8 +68,34 @@ bool Faiseur::collision_element(const Faiseur& autre_faiseur) {
     return collisionEntreCercles(c1, c2);
 }
 
+void Faiseur::update() {
+    // Update position based on velocity
+    position = nextDestination(position, vecteurVitesse);
 
+    // Check for collision with arena boundary and bounce if necessary
+    if (!Arene_ex.point_appartient_cercle(position)) {
+        rebond(position, vecteurVitesse);
+        position = nextDestination(position, vecteurVitesse);
+    }
 
+    // Update the positions of the body segments
+    double angle = vecteurVitesse.theta + M_PI; // opposite direction
+    renormalisation(angle);
+    for (size_t i = 0; i < corps.size(); ++i) {
+        S2d pos = (i == 0) ? position : corps[i-1].get_centre();
+        if (i != 0) {
+            Polar vector = {vecteurVitesse.r, angle};
+            if (!Arene_ex.cercle_appartient_cercle({
+                nextDestination(pos, vector), rayon
+            })) {
+                rebond(pos, vector);
+            }
+            pos = nextDestination(pos, vector);
+        }
+        corps[i].change_centre(pos);
+        corps[i].change_rayon(rayon);
+    }
+}
 
 void Faiseur::initialisation_corps() {
     double angle = vecteurVitesse.theta + M_PI; // sens opposée
@@ -76,6 +116,12 @@ void Faiseur::initialisation_corps() {
     }
 }
 
-
-
-
+bool Faiseur::collision_tete_elements(const S2d& position_tete, double rayon_tete, const Faiseur& autre_faiseur) {
+    // Vérifier collision entre la tête et les éléments de l'autre faiseur
+    for (const auto& element : autre_faiseur.get_corps()) {
+        if (dist_deux_pts(position_tete, element.get_centre()) <= rayon_tete + element.get_rayon() + epsil_zero) {
+            return true;
+        }
+    }
+    return false;
+}
