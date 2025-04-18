@@ -10,65 +10,52 @@ namespace mobile {
 	 * Classe de base pour les objets mobiles du jeu
 	 * Contient la position et le vecteur vitesse
 	 */
-	// Dans la classe Mobile, ajoutez ces méthodes publiques
 	class Mobile {
 	public:
-	  Mobile(tools::S2d p, tools::Polar v);
-	  Mobile();
+		Mobile(tools::S2d p,tools:: Polar v);
+		Mobile();
 
-	  // Ajout des getters virtuels
-	  virtual tools::S2d getPosition() const { return position; }
-	  virtual tools::Polar getVecteurVitesse() const { return vecteurVitesse; }
+		// Getters publics pour les attributs protégés
+		const tools::S2d& get_position() const;
+		const tools::Polar& get_vitesse() const;
 
 	protected:
-	  tools::S2d position;
-	  tools::Polar vecteurVitesse;
+		tools::S2d position;
+		tools::Polar vecteurVitesse;
 	};
-
-	// Dans la classe Particule
-	class Particule : protected Mobile {
+	class Particule:protected Mobile {
 	public:
-	Particule(tools::S2d position, tools::Polar vecteurVitesse, double compteur);
-	void update(); // P9ac3
-	// Surcharge des getters avec override
-	tools::S2d getPosition() const override { return position; }
-	tools::Polar getVecteurVitesse() const override { return vecteurVitesse; }
-	// Getter spécifique pour compteur
-	unsigned getCompteur() const { return compteur; }
-	void incrementerCompteur() { compteur++; }
-	void resetCompteur() { compteur = 0; }
-	void setVecteurVitesse(const tools::Polar& vit) { vecteurVitesse = vit; }
-	void deplacer();
+
+		Particule(tools::S2d position,tools::Polar vecteurVitesse, double compteur);
+
+		// Getters publics pour les attributs de Mobile (via héritage) et Particule
+		const tools::S2d& get_position() const;
+		const tools::Polar& get_vitesse() const;
+		unsigned get_compteur() const;
+
+
 	private:
-	unsigned compteur;
+		unsigned compteur;
 	};
-
-	// Dans la classe Faiseur
-	class Faiseur : protected Mobile {
+	class Faiseur:protected Mobile {
 	public:
-	  Faiseur(tools::S2d position_tete, tools::Polar vecteurVitesse,
-	         double rayon, int taille);
-	  Faiseur();
-	  void initialisation_corps();
-	  bool collision_element(const Faiseur& autre_faiseur);
-	  const std::vector<tools::Cercle>& get_corps() const { return corps; }
-	  void update(); // P2e09
+		Faiseur(tools::S2d position_tete,tools:: Polar vecteurVitesse,
+															double rayon, int taille);
+		Faiseur();
+		void initialisation_corps();
+		bool collision_element(const Faiseur& autre_faiseur);
+		const std::vector<tools::Cercle>& get_corps() const { return corps; }
 
-	  // Surcharge des getters avec override
-	  tools::S2d getPosition() const override { return position; }
-	  tools::Polar getVecteurVitesse() const override { return vecteurVitesse; }
-	  // Getters spécifiques
-	  double getRayon() const { return rayon; }
-	  int getTaille() const { return taille; }
+		// Getters publics pour les attributs de Mobile (via héritage) et Faiseur
+		const tools::S2d& get_position() const;
+		const tools::Polar& get_vitesse() const;
+		double get_rayon() const;
+		int get_taille() const;
 
-		tools::S2d calculer_nouvelle_position() const {
-		    return nextDestination(position, vecteurVitesse);
-		}
-	static bool collision_tete_elements(const tools::S2d& position_tete, double rayon_tete, const Faiseur& autre_faiseur);
 	private:
-	  std::vector<tools::Cercle> corps;
-	  double rayon;
-	  int taille;
+		std::vector<tools::Cercle> corps;
+		double rayon;
+		int taille;
 	};
 }
 

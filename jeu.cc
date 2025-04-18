@@ -58,7 +58,7 @@ void Jeu::reset() {
  * return true si la lecture a réussi et les données sont valides, false sinon.
  *        En cas d'échec, l'état du jeu est réinitialisé (vide).
  */
-bool Jeu::readFile(const string& nomFichier) {
+bool Jeu::lecture(const string& nomFichier) {
     ifstream file(nomFichier);
     reset(); // Réinitialisation préalable
 
@@ -438,4 +438,48 @@ bool Jeu::verifier_collisions_faiseurs() const {
         }
     }
     return true; // Aucune collision détectée
+}
+
+bool Jeu::sauvegarder(const std::string& nom_fichier) const{
+    ofstream file(nom_fichier);
+    if (!file.is_open()) {
+        cout << "Erreur: Impossible d'ouvrir le fichier " << nom_fichier << endl;
+        return false; // Échec de l'ouverture
+    }
+
+    // Écrire le score
+    file << score << endl;
+
+    // Écrire les particules
+    file << particules.size() << endl;
+    for (const auto& particule : particules) {
+        const auto& pos = particule->get_position();
+        const auto& vit = particule->get_vitesse();
+        file << pos.x << " " << pos.y << " "
+             << vit.theta << " " << vit.r << " "
+             << particule->get_compteur() << endl;
+    }
+
+    // Écrire les faiseurs
+    file << faiseurs.size() << endl;
+    for (const auto& faiseur : faiseurs) {
+        const auto& pos = faiseur->get_position();
+        const auto& vit = faiseur->get_vitesse();
+        file << pos.x << " " << pos.y << " "
+             << vit.theta << " " << vit.r << " "
+             << faiseur->get_rayon() << " "
+             << faiseur->get_taille() << endl;
+    }
+
+    // Écrire les articulations de la chaîne
+    file << chaine.getArticulations().size() << endl;
+    for (const auto& articulation : chaine.getArticulations()) {
+        file << articulation.x << " " << articulation.y << endl;
+    }
+
+    // Écrire le mode
+    file << (mode == CONSTRUCTION ? "CONSTRUCTION" : "GUIDAGE") << endl;
+
+    file.close(); // Fermeture explicite
+    return true; // Succès
 }
