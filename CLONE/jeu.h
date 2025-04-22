@@ -29,13 +29,19 @@ public:
 		tools::Cercle arene, Mode mode);
 
 	// Lecture et sauvegarde
-	bool lecture(const std::string& nomFichier); // Retourne bool
+	bool readFile(const std::string& nomFichier); // Retourne bool
 	bool sauvegarder(const std::string& nom_fichier) const; // Mettre à jour la déclaration
 
 	// Autres méthodes publiques
 	void reset();
 	void set_score(unsigned int score);
 	void ajouterFaiseur(const mobile::Faiseur& faiseur);
+	double get_score{return score;}
+	double get_Nb_articulations{return chaine.getArticulations().size();}
+	double get_Nb_faiseurs{return faiseurs.size();}
+	double get_Nb_particules{return particules.size();}
+	std::string get_status ();//a ecrire
+	void update();//a ecrire
 
 private:
 	// Méthodes auxiliaires pour readFile (maintenant privées)

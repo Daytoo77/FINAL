@@ -138,17 +138,22 @@ void My_window::start_clicked()
     }
 }
 void My_window::step_clicked()
-{
+{    if (!activated){
+    update();
+}
+else return;
     // remplacer affichage par votre code
-    cout << __func__ << endl;
+    //cout << __func__ << endl;
 }
 void My_window::build_clicked()
 {
+    //RENDU 3
     // remplacer affichage par votre code
     cout << __func__ << endl;
 }
 void My_window::guide_clicked()
 {
+    //RENDU 3
     // remplacer affichage par votre code
     cout << __func__ << endl;
 }
@@ -165,18 +170,51 @@ bool My_window::key_pressed(guint keyval, guint keycode, Gdk::ModifierType state
     switch (keyval)
     {
     case '1':
+        //meme code que pour start
         // remplacer affichage par votre code
-		cout << keyval <<"  " << __func__ << endl;
+		//cout << keyval <<"  " << __func__ << endl;
+        if (activated) // variable d'état: true si le jeu est en cours
+        {
+            loop_conn.disconnect();
+            activated = false;
+            buttons[B_EXIT].set_sensitive(true);
+            buttons[B_OPEN].set_sensitive(true);
+            buttons[B_SAVE].set_sensitive(true);
+            buttons[B_RESTART].set_sensitive(true);
+            buttons[B_START].set_label("start");
+            buttons[B_STEP].set_sensitive(true);
+        }
+        else // if (appel pour obtenir le statut du jeu !== ON_GOING) // voir jeu.h
+        {
+            loop_conn = Glib::signal_timeout().connect(sigc::mem_fun(*this,
+                                                                 &My_window::loop),
+                                                   25);
+            activated = true;
+            buttons[B_EXIT].set_sensitive(false);
+            buttons[B_OPEN].set_sensitive(false);
+            buttons[B_SAVE].set_sensitive(false);
+            buttons[B_RESTART].set_sensitive(false);
+            buttons[B_START].set_label("stop");
+            buttons[B_STEP].set_sensitive(false);
+        }
 
         return true;
     case 's':
+        //meme code que pour step
         // remplacer affichage par votre code
-		cout << keyval <<"  " << __func__ << endl;
-
+		//cout << keyval <<"  " << __func__ << endl;
+         if (!activated){
+            update();
+        }
+    
         return true;
     case 'r':
+        //meme code que pour restart
         // remplacer affichage par votre code
-		cout << keyval <<"  " << __func__ << endl;
+		//cout << keyval <<"  " << __func__ << endl;
+        jeu.reset();
+        update_infos();
+        drawing.queue_draw();
 
         return true;
     default:
@@ -266,20 +304,20 @@ void My_window::update()
 {
 	// remplacer affichage par votre code
 	cout <<  __func__ << endl;
-
+    jeu.update();
     update_infos();
     drawing.queue_draw();
 
-    //~ if (appel pour obtenir le statut du jeu !== ON_GOING) // voir jeu.h
-    //~ {
+     if (jeu.get_status() !== ON_GOING) // voir jeu.h
+     {
 		//~ ...
-        //~ buttons[B_SAVE].set_sensitive(false);
-        //~ buttons[B_START].set_sensitive(false);
-        //~ buttons[B_STEP].set_sensitive(false);
-        //~ checks[0].set_active(true);
-        //~ checks[0].set_sensitive(false);
-        //~ checks[1].set_sensitive(false);
-	//~ }
+         buttons[B_SAVE].set_sensitive(false);
+        buttons[B_START].set_sensitive(false);
+         buttons[B_STEP].set_sensitive(false);
+        checks[0].set_active(true);
+        checks[0].set_sensitive(false);
+        checks[1].set_sensitive(false);
+	 }
 }
 
 void My_window::set_infos()
@@ -299,13 +337,16 @@ void My_window::set_infos()
 void My_window::update_infos()
 {
  	// remplacer affichage par votre code
-	cout <<  __func__ << endl;
+	//cout <<  __func__ << endl;
 
-    {
-        for (auto &value : info_value)
+    {   info_value[0].set_text(std::to_string(jeu.get_score()));
+        info_value[1].set_text(std::to_string(jeu.get_Nb_particules()));
+        info_value[2].set_text(std::to_string(jeu.get_Nb_faiseurs()));
+        info_value[3].set_text(std::to_string(jeu.get_Nb_articulations()));
+        /*for (auto &value : info_value)
         {
             value.set_text("0");
-        }
+        }*/
     }
 }
 

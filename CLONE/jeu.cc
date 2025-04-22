@@ -58,7 +58,7 @@ void Jeu::reset() {
  * return true si la lecture a réussi et les données sont valides, false sinon.
  *        En cas d'échec, l'état du jeu est réinitialisé (vide).
  */
-bool Jeu::lecture(const string& nomFichier) {
+bool Jeu::readFile(const string& nomFichier) {
     ifstream file(nomFichier);
     reset(); // Réinitialisation préalable
 
