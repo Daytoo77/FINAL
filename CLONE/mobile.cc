@@ -55,14 +55,6 @@ Faiseur::Faiseur(S2d position,Polar vecteurVitesse, double rayon, int taille)
         }
 
     corps.resize(taille);
-
-    for (size_t i(0); i < corps.size(); ++i) {
-        if (!Arene_ex.point_appartient_cercle(corps[i].get_centre())) {
-            cout<<message::faiseur_outside(corps[i].get_centre().x,
-                                           corps[i].get_centre().y)<<endl;
-            exit(EXIT_FAILURE);
-            }
-        }
     if ((rayon>r_max_faiseur)or(rayon<r_min_faiseur)) {
         cout<<message::faiseur_radius(rayon)<<endl;
         exit(EXIT_FAILURE);
@@ -93,7 +85,7 @@ void Faiseur::initialisation_corps() {
         } else {
             // Calculer la position basée sur l'élément précédent
             S2d prev_pos = corps[i-1].get_centre();
-            Polar vector_to_prev = {rayon * 2.0, angle_oppose}; // Distance de 2*rayon
+            Polar vector_to_prev = {VecteurVitesse.r, angle_oppose}; 
             S2d next_pos_candidate = nextDestination(prev_pos, vector_to_prev);
 
             // Vérifier si la position candidate est dans l'arène

@@ -266,7 +266,7 @@ bool Jeu::decodage_particule(istringstream& data) {
 
     renormalisation(angle);
     S2d pos{x, y};
-    Polar vit{angle, distance};
+    Polar vit{distance,angle};
 
     if (!arene.point_appartient_cercle(pos)) {
         cout << message::particule_outside(x, y) << endl;
@@ -322,7 +322,7 @@ bool Jeu::decodage_faiseur(istringstream& data) {
     }
 
     S2d pos{x, y};
-    Polar vit{a, d}; // Attention: l'ordre dans Polar est {angle, distance}
+    Polar vit{d, a}; // Attention: l'ordre dans Polar est {distance, angle}
 
     // Créer temporairement pour vérifier l'appartenance à l'arène
     auto temp_faiseur_ptr = make_unique<mobile::Faiseur>(pos, vit, r, taille);
